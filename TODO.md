@@ -1,0 +1,19 @@
+- Komodor Helm Dashboard
+- AWS LoadBalancer Controller
+- Cluster Autoscaler
+- Datadog
+- FluentBit
+- Metrics Server
+- Strimzi Kafka Operator
+- Hashicorp Vault
+- AWS SecretsManagerr Injector
+- Teleport
+- Apache Airflow
+- OPA Gatekeeper
+- Argo Workflows, Jenkins, Drone, Spinnaker or other CI workflow https://argoproj.github.io/argo-workflows/
+- Atlantis - Terraform Workflow Automation https://www.runatlantis.io/
+- External Secrets - Syncs Kubernetes secrets with Vault secrets https://github.com/external-secrets/kubernetes-external-secrets
+- GitHub Action Runner - Self Hosted GitHub Action Runner https://github.com/features/actions
+- Metaphor - A sample app to demonstrate CI/CD in on Kubernetes. Contains Devlopment, Staging, and Production environments. https://github.com/kubefirst/metaphor-frontend-template
+- Renovate - https://github.com/renovatebot/renovate
+- Backstage.io
