@@ -3,14 +3,14 @@ apiVersion: fleet.cattle.io/v1alpha1
 kind: GitRepo
 metadata:
   name: kubecost
-  namespace: fleet-local
+  namespace: fleet-default
 spec:
   branch: dev
   paths:
-    - fleet-local/cost-analyzer
+    - fleet/cost-analyzer
   repo: https://github.com/johnko/rancher-demo.git
   targets:
-    - name: demo-group-label
-      clusterGroupSelector:  # match label of ClusterGroup
+    - name: production
+      clusterGroupSelector:
         matchLabels:
-          env: demo-group-label
+          production: 'true'

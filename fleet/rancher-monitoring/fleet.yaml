@@ -50,4 +50,4 @@ helm:
         enabled: false
 
 dependsOn:
-  - name: rancher-monitoring-crd-fleet-local-rancher-moni-315b4
+  - name: rancher-monitoring-crd-fleet-rancher-monitoring-crd

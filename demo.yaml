@@ -1,0 +1,120 @@
+---
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: fleet-local-init
+  namespace: fleet-local
+  annotations:
+    field.cattle.io/description: DON'T DELETE
+spec:
+  branch: dev
+  paths:
+    - fleet/_init
+  repo: https://github.com/johnko/rancher-demo.git
+  targets:
+    - name: local
+      clusterSelector:  # match label of Cluster
+        matchLabels:
+          management.cattle.io/cluster-name: local
+---
+apiVersion: fleet.cattle.io/v1alpha1
+kind: ClusterGroup
+metadata:
+  name: demo  # used for clusterGroup
+  namespace: fleet-default
+  labels:
+    env: demo  # used for clusterGroupSelector
+spec:
+  selector:
+    matchLabels:
+      env: demo  # used for clusterSelector
+---
+apiVersion: fleet.cattle.io/v1alpha1
+kind: ClusterGroup
+metadata:
+  name: batch
+  namespace: fleet-default
+  labels:
+    batch: 'true'
+spec:
+  selector:
+    matchLabels:
+      batch: 'true'
+---
+apiVersion: fleet.cattle.io/v1alpha1
+kind: ClusterGroup
+metadata:
+  name: nonp
+  namespace: fleet-default
+spec:
+  selector:
+    matchExpressions:
+      - key: production
+        operator: NotIn
+        values:
+          - 'true'
+---
+apiVersion: fleet.cattle.io/v1alpha1
+kind: ClusterGroup
+metadata:
+  name: prod
+  namespace: fleet-default
+  labels:
+    production: 'true'
+spec:
+  selector:
+    matchLabels:
+      production: 'true'
+---
+kind: ClusterRegistrationToken
+apiVersion: "fleet.cattle.io/v1alpha1"
+metadata:
+    name: demo-token
+    namespace: fleet-default
+spec:
+    # A duration string for how long this token is valid for. A value <= 0 or null means infinite time.
+    ttl: 24h
+---
+kind: Cluster
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: kind-cicd
+  namespace: fleet-default
+  labels:
+    env: demo
+    build: 'true'
+spec:
+  clientID: kind-cicd
+---
+kind: Cluster
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: kind-qa
+  namespace: fleet-default
+  labels:
+    env: demo
+spec:
+  clientID: kind-qa
+---
+kind: Cluster
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: kind-data
+  namespace: fleet-default
+  labels:
+    env: demo
+    batch: 'true'
+    production: 'true'
+spec:
+  clientID: kind-data
+---
+kind: Cluster
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
+  name: kind-prod
+  namespace: fleet-default
+  labels:
+    env: demo
+    production: 'true'
+spec:
+  clientID: kind-prod

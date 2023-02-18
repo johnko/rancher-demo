@@ -2,15 +2,15 @@
 apiVersion: fleet.cattle.io/v1alpha1
 kind: GitRepo
 metadata:
-  name: argo-cd
+  name: rancher-monitoring
   namespace: fleet-local
 spec:
   branch: dev
   paths:
-    - fleet-local/argo-cd
+    - fleet/rancher-monitoring
   repo: https://github.com/johnko/rancher-demo.git
   targets:
-    - name: demo-group-label
-      clusterGroupSelector:  # match label of ClusterGroup
+    - name: local
+      clusterSelector:  # match label of Cluster
         matchLabels:
-          env: demo-group-label
+          management.cattle.io/cluster-name: local

@@ -2,14 +2,12 @@
 apiVersion: fleet.cattle.io/v1alpha1
 kind: GitRepo
 metadata:
-  name: fleet-local-init
+  name: kubecost
   namespace: fleet-local
-  annotations:
-    field.cattle.io/description: DON'T DELETE
 spec:
   branch: dev
   paths:
-    - fleet-local/_init
+    - fleet/cost-analyzer
   repo: https://github.com/johnko/rancher-demo.git
   targets:
     - name: local
