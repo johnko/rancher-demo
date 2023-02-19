@@ -23,12 +23,14 @@ Tested on:
 ## Start Management and Member clusters
 
 ```shell
-./run-rancher-demo.sh
+./run-rancher-demo.sh start
 ```
 
 Wait for a while and the browser should open the local demo **Rancher dashboard** at `https://localhost:8443/`
 
 ## Install Fleet Agent on Member clusters to join Management cluster
+
+In another terminal:
 
 ```shell
 ./run-rancher-demo.sh join

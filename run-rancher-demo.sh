@@ -15,7 +15,17 @@
 # https://ranchermanager.docs.rancher.com/getting-started/quick-start-guides/deploy-rancher-manager/helm-cli
 #####################################################################
 
-set -e
+set -eu
+
+MGMT_CLUSTER="mgmt"
+MGMT_CONTEXT="kind-$MGMT_CLUSTER"
+MGMT_KUBECTL="kubectl --context $MGMT_CONTEXT"
+TEAM_CLUSTERS="
+cicd
+qa
+data
+prod
+"
 
 create_kind_cluster() {
   # image from https://github.com/kubernetes-sigs/kind/releases
@@ -45,77 +55,66 @@ install_fleet_agent() {
     --set apiServerURL="${API_SERVER_URL}" \
     fleet-agent ./helm-charts/fleet-agent
 }
-MGMT_CLUSTER="mgmt"
-set -u
-MGMT_CONTEXT="kind-$MGMT_CLUSTER"
-MGMT_KUBECTL="kubectl --context $MGMT_CONTEXT"
-TEAM_CLUSTERS="
-cicd
-qa
-data
-prod
-"
-set +u
 if [ "delete" == "$1" ]; then
-  set -u
   for i in $MGMT_CLUSTER $TEAM_CLUSTERS; do
     delete_kind_cluster $i
   done
   exit 0
 fi
 if [ "join" == "$1" ]; then
-  set -u
   $MGMT_KUBECTL -n fleet-default get secret demo-token -o 'jsonpath={.data.values}' | base64 --decode > values.yaml
   for i in $TEAM_CLUSTERS; do
     install_fleet_agent $i "${prod_label} ${batch_label}"
   done
   exit 0
 fi
+if [ "start" == "$1" ]; then
+  set -x
 
-set -ux
+  create_kind_cluster $MGMT_CLUSTER
+  kubectl config use-context $MGMT_CONTEXT
+  $MGMT_KUBECTL create namespace cattle-system
+  # mkdir -p ./crds
+  # curl -L -o ./crds/cert-manager.crds.yaml https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.crds.yaml
+  $MGMT_KUBECTL apply -f ./crds/cert-manager.crds.yaml
+  # helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
+  # helm repo add jetstack https://charts.jetstack.io
+  # helm repo update
+  # mkdir -p ./helm-charts
+  # pushd ./helm-charts
+  # helm pull --untar jetstack/cert-manager --version v1.7.1
+  # popd
+  helm install cert-manager ./helm-charts/cert-manager \
+    --namespace cert-manager \
+    --create-namespace \
+    --version v1.7.1
+  PASSWORD_FOR_RANCHER_ADMIN=$( cat /dev/random | LC_ALL=C tr -dc 'a-zA-Z0-9-_' | fold -w 30 | head -n 1 )
+  # pushd ./helm-charts
+  # helm pull --untar rancher-latest/rancher
+  # popd
+  helm install rancher ./helm-charts/rancher \
+    --namespace cattle-system \
+    --set hostname=127.0.0.1.sslip.io \
+    --set replicas=1 \
+    --set bootstrapPassword="$PASSWORD_FOR_RANCHER_ADMIN"
+  # $MGMT_KUBECTL get secret --namespace cattle-system bootstrap-secret \
+  #   -o go-template='{{.data.bootstrapPassword|base64decode}}{{ "\n" }}'
 
-create_kind_cluster $MGMT_CLUSTER
-kubectl config use-context $MGMT_CONTEXT
-$MGMT_KUBECTL create namespace cattle-system
-# mkdir -p ./crds
-# curl -L -o ./crds/cert-manager.crds.yaml https://github.com/cert-manager/cert-manager/releases/download/v1.7.1/cert-manager.crds.yaml
-$MGMT_KUBECTL apply -f ./crds/cert-manager.crds.yaml
-# helm repo add rancher-latest https://releases.rancher.com/server-charts/latest
-# helm repo add jetstack https://charts.jetstack.io
-# helm repo update
-# mkdir -p ./helm-charts
-# pushd ./helm-charts
-# helm pull --untar jetstack/cert-manager --version v1.7.1
-# popd
-helm install cert-manager ./helm-charts/cert-manager \
-  --namespace cert-manager \
-  --create-namespace \
-  --version v1.7.1
-PASSWORD_FOR_RANCHER_ADMIN=$( cat /dev/random | LC_ALL=C tr -dc 'a-zA-Z0-9-_' | fold -w 30 | head -n 1 )
-# pushd ./helm-charts
-# helm pull --untar rancher-latest/rancher
-# popd
-helm install rancher ./helm-charts/rancher \
-  --namespace cattle-system \
-  --set hostname=127.0.0.1.sslip.io \
-  --set replicas=1 \
-  --set bootstrapPassword="$PASSWORD_FOR_RANCHER_ADMIN"
-# $MGMT_KUBECTL get secret --namespace cattle-system bootstrap-secret \
-#   -o go-template='{{.data.bootstrapPassword|base64decode}}{{ "\n" }}'
-
-for i in $TEAM_CLUSTERS; do
-  create_kind_cluster $i
-done
-
-$MGMT_KUBECTL -n fleet-local patch clusters.fleet.cattle.io local --type merge --patch '{"metadata":{"labels":{"env":"mgmt"}}}'
-$MGMT_KUBECTL apply -f ./demo.yaml
-set +x
-echo "Use this password to login to Rancher local demo UI: $PASSWORD_FOR_RANCHER_ADMIN"
-open "https://localhost:8443/"
-for i in $(seq 1 10); do
-  for pauser in $(seq 1 30); do
-    echo -n '.'
-    sleep 1
+  for i in $TEAM_CLUSTERS; do
+    create_kind_cluster $i
   done
-  $MGMT_KUBECTL -n cattle-system port-forward svc/rancher 8443:443 || true
-done
+
+  $MGMT_KUBECTL -n fleet-local patch clusters.fleet.cattle.io local --type merge --patch '{"metadata":{"labels":{"env":"mgmt"}}}'
+  $MGMT_KUBECTL apply -f ./demo.yaml
+  set +x
+  echo "Use this password to login to Rancher local demo UI: $PASSWORD_FOR_RANCHER_ADMIN"
+  open "https://localhost:8443/"
+  for i in $(seq 1 10); do
+    for pauser in $(seq 1 30); do
+      echo -n '.'
+      sleep 1
+    done
+    $MGMT_KUBECTL -n cattle-system port-forward svc/rancher 8443:443 || true
+  done
+  exit 0
+fi
