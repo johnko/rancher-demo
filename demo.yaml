@@ -2,7 +2,7 @@
 apiVersion: fleet.cattle.io/v1alpha1
 kind: GitRepo
 metadata:
-  name: fleet-local-init
+  name: aaa-init-fleet-local
   namespace: fleet-local
   annotations:
     field.cattle.io/description: DON'T DELETE - initializes the GitRepos in the fleet-local namespace
@@ -20,7 +20,7 @@ spec:
 apiVersion: fleet.cattle.io/v1alpha1
 kind: GitRepo
 metadata:
-  name: fleet-default-init
+  name: aaa-init-fleet-default
   namespace: fleet-local
   annotations:
     field.cattle.io/description: DON'T DELETE - initializes the GitRepos in the fleet-default namespace
