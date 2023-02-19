@@ -5,7 +5,7 @@ metadata:
   name: rancher-monitoring-crd
   namespace: fleet-local
 spec:
-  branch: dev
+  branch: main
   paths:
     - fleet/rancher-monitoring-crd
   repo: https://github.com/johnko/rancher-demo.git

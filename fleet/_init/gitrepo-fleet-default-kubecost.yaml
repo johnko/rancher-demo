@@ -5,7 +5,7 @@ metadata:
   name: kubecost
   namespace: fleet-default
 spec:
-  branch: dev
+  branch: main
   paths:
     - fleet/cost-analyzer
   repo: https://github.com/johnko/rancher-demo.git

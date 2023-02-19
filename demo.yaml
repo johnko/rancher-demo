@@ -7,7 +7,7 @@ metadata:
   annotations:
     field.cattle.io/description: DON'T DELETE
 spec:
-  branch: dev
+  branch: main
   paths:
     - fleet/_init
   repo: https://github.com/johnko/rancher-demo.git

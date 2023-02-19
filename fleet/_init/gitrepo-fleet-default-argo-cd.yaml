@@ -5,7 +5,7 @@ metadata:
   name: argo-cd
   namespace: fleet-default
 spec:
-  branch: dev
+  branch: main
   paths:
     - fleet/argo-cd
   repo: https://github.com/johnko/rancher-demo.git
