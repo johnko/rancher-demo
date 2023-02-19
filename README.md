@@ -1,6 +1,6 @@
 # rancher-demo
 
-Rancher k8s ControlPlane + k8s Application Lifecycle Demo
+Rancher k8s dashboard + GitOps with Rancher Fleet + k8s Application Lifecycle Demo
 
 This demo creates a Management cluster via [KinD](https://kind.sigs.k8s.io/) and installs [Rancher](https://ranchermanager.docs.rancher.com/) in it.
 Then creates 4 other Member clusters (qa, cicd, data, prod) and joins them to the Management cluster via [Rancher Fleet](https://fleet.rancher.io/).
