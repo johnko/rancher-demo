@@ -67,20 +67,6 @@ if [ "join" == "$1" ]; then
   set -u
   $MGMT_KUBECTL -n fleet-default get secret demo-token -o 'jsonpath={.data.values}' | base64 --decode > values.yaml
   for i in $TEAM_CLUSTERS; do
-    case $i in
-      data)
-        prod_label="--set-string labels.production=true"
-        batch_label="--set-string labels.batch=true"
-        ;;
-      prod)
-        prod_label="--set-string labels.production=true"
-        batch_label="--set-string labels.batch=false"
-        ;;
-      *)
-        prod_label="--set-string labels.production=false"
-        batch_label="--set-string labels.batch=false"
-        ;;
-    esac
     install_fleet_agent $i "${prod_label} ${batch_label}"
   done
   exit 0
