@@ -96,6 +96,16 @@ spec:
 kind: Cluster
 apiVersion: fleet.cattle.io/v1alpha1
 metadata:
+  name: kind-dev
+  namespace: fleet-default
+  labels:
+    env: demo
+spec:
+  clientID: kind-dev
+---
+kind: Cluster
+apiVersion: fleet.cattle.io/v1alpha1
+metadata:
   name: kind-cicd
   namespace: fleet-default
   labels:

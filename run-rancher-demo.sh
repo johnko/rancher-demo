@@ -21,6 +21,7 @@ MGMT_CLUSTER="mgmt"
 MGMT_CONTEXT="kind-$MGMT_CLUSTER"
 MGMT_KUBECTL="kubectl --context $MGMT_CONTEXT"
 TEAM_CLUSTERS="
+dev
 cicd
 qa
 data
@@ -57,6 +58,17 @@ if [ "delete" == "$1" ]; then
   for i in $MGMT_CLUSTER $TEAM_CLUSTERS; do
     delete_kind_cluster $i
   done
+  exit 0
+fi
+if [ "import" == "$1" ]; then
+  API_SERVER_URL=$(kubectl config view --context $MGMT_CONTEXT --minify --output jsonpath='{.clusters[*].cluster.server}' | sed 's/127.0.0.1/mgmt-control-plane/')
+  sed -i '' "s,https://localhost:8443,$API_SERVER_URL," import.yaml
+  if echo "337a0d22ac16b46582b8e2c5737fc2e2f5ed34d8  import.yaml" | shasum -c 2>&1 >/dev/null ; then
+    echo "Don't use the default import.yaml since the token is invalid."
+    echo "Generate a new import.yaml"
+    exit 1
+  fi
+  kubectl --context kind-dev apply -f import.yaml
   exit 0
 fi
 if [ "join" == "$1" ]; then
