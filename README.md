@@ -6,10 +6,23 @@ This demo creates a Management cluster via [KinD](https://kind.sigs.k8s.io/) and
 Then creates 4 other Member clusters (qa, cicd, data, prod) and joins them to the Management cluster via [Rancher Fleet](https://fleet.rancher.io/).
 
 ```text
-              mgmt
-  _____________|_____________
- /        /        \         \
-qa      cicd      data      prod
+mgmt (Rancher Manager)
+   |
+   |
+   v
+  dev
+
+Rancher Manager UI can be used to manipulate some clusters.
+```
+
+```text
+          mgmt (Rancher Fleet)
+               ^
+  _____________|______________________
+ /        /        \         \        \
+dev      qa      cicd      data      prod
+
+Agents in Member clusters report to Fleet Manager.
 ```
 
 ## Requirements
