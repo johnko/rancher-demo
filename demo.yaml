@@ -5,11 +5,29 @@ metadata:
   name: fleet-local-init
   namespace: fleet-local
   annotations:
-    field.cattle.io/description: DON'T DELETE
+    field.cattle.io/description: DON'T DELETE - initializes the GitRepos in the fleet-local namespace
 spec:
   branch: main
   paths:
-    - fleet/_init
+    - fleet/_init-fleet-local
+  repo: https://github.com/johnko/rancher-demo.git
+  targets:
+    - name: local
+      clusterSelector:  # match label of Cluster
+        matchLabels:
+          management.cattle.io/cluster-name: local
+---
+apiVersion: fleet.cattle.io/v1alpha1
+kind: GitRepo
+metadata:
+  name: fleet-default-init
+  namespace: fleet-local
+  annotations:
+    field.cattle.io/description: DON'T DELETE - initializes the GitRepos in the fleet-default namespace
+spec:
+  branch: dev
+  paths:
+    - fleet/_init-fleet-default
   repo: https://github.com/johnko/rancher-demo.git
   targets:
     - name: local

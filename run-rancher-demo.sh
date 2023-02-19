@@ -40,14 +40,12 @@ delete_kind_cluster() {
 }
 install_fleet_agent() {
   # https://rancher.github.io/fleet/agent-initiated/
-  CLUSTER_LABELS="$2"
   CLUSTER_CLIENT_ID="kind-$1"
   API_SERVER_URL=$(kubectl config view --context $MGMT_CONTEXT --minify --output jsonpath='{.clusters[*].cluster.server}' | sed 's/127.0.0.1/mgmt-control-plane/')
   API_SERVER_CA=$(kubectl config view --context $MGMT_CONTEXT --minify --raw -o go-template='{{index ((index (index .clusters 0) "cluster")) "certificate-authority-data"|base64decode}}')
   kubectl config use-context $CLUSTER_CLIENT_ID
   # curl -L -O https://github.com/rancher/fleet/releases/download/v0.5.1/fleet-agent-0.5.1.tgz
   helm -n cattle-fleet-system upgrade --atomic --install --create-namespace --wait \
-    ${CLUSTER_LABELS} \
     --set-string labels.env=demo \
     --set clientID="${CLUSTER_CLIENT_ID}" \
     --values values.yaml \
@@ -64,7 +62,7 @@ fi
 if [ "join" == "$1" ]; then
   $MGMT_KUBECTL -n fleet-default get secret demo-token -o 'jsonpath={.data.values}' | base64 --decode > values.yaml
   for i in $TEAM_CLUSTERS; do
-    install_fleet_agent $i "${prod_label} ${batch_label}"
+    install_fleet_agent $i
   done
   exit 0
 fi
@@ -108,7 +106,7 @@ if [ "start" == "$1" ]; then
   $MGMT_KUBECTL apply -f ./demo.yaml
   set +x
   echo "Use this password to login to Rancher local demo UI: $PASSWORD_FOR_RANCHER_ADMIN"
-  open "https://localhost:8443/"
+  open "https://localhost:8443/dashboard/?setup=$PASSWORD_FOR_RANCHER_ADMIN"
   for i in $(seq 1 10); do
     for pauser in $(seq 1 30); do
       echo -n '.'
