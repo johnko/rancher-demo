@@ -63,12 +63,12 @@ roleRef:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: cattle-credentials-0a2dd05
+  name: cattle-credentials-260ac3d
   namespace: cattle-system
 type: Opaque
 data:
-  url: ""
-  token: ""
+  url: "aHR0cHM6Ly9tZ210LWNvbnRyb2wtcGxhbmU6ODQ0Mw=="
+  token: "YnI0Ym0yczY2a3NibXdjNW44N3Z6NGtzdDR0aGRuczV0ZjJzeHJ0NzV0OHB2cnFyZHBkNjU"
   namespace: ""
 
 ---
@@ -181,9 +181,9 @@ spec:
           - name: CATTLE_IS_RKE
             value: "false"
           - name: CATTLE_SERVER
-            value: "https://mgmt-control-plane:55876"
+            value: "https://mgmt-control-plane:8443"
           - name: CATTLE_CA_CHECKSUM
-            value: ""
+            value: "060895aef613d18267f65f5c9fad5d3d20ecb22ea10097beea70c1e69e49745e"
           - name: CATTLE_CLUSTER
             value: "true"
           - name: CATTLE_K8S_MANAGED
@@ -193,7 +193,7 @@ spec:
           - name: CATTLE_SERVER_VERSION
             value: v2.7.1
           - name: CATTLE_INSTALL_UUID
-            value:
+            value: 9b358661-3b3c-49eb-863a-61cd4c03d007
           - name: CATTLE_INGRESS_IP_DOMAIN
             value: sslip.io
           image: rancher/rancher-agent:v2.7.1
@@ -204,7 +204,7 @@ spec:
       volumes:
       - name: cattle-credentials
         secret:
-          secretName: cattle-credentials-0a2dd05
+          secretName: cattle-credentials-260ac3d
           defaultMode: 320
   strategy:
     type: RollingUpdate

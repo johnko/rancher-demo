@@ -61,9 +61,7 @@ if [ "delete" == "$1" ]; then
   exit 0
 fi
 if [ "import" == "$1" ]; then
-  API_SERVER_URL=$(kubectl config view --context $MGMT_CONTEXT --minify --output jsonpath='{.clusters[*].cluster.server}' | sed 's/127.0.0.1/mgmt-control-plane/')
-  sed -i '' "s,localhost,mgmt-control-plane," import.yaml
-  if echo "337a0d22ac16b46582b8e2c5737fc2e2f5ed34d8  import.yaml" | shasum -c 2>&1 >/dev/null ; then
+  if echo "74a426d03e178b371c511bd781d96a499417d593  import.yaml" | shasum -c 2>&1 >/dev/null ; then
     echo "Don't use the default import.yaml since the token is invalid."
     echo "Generate a new import.yaml"
     exit 1
