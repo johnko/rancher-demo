@@ -109,10 +109,6 @@ spec:
       labels:
         app: cattle-cluster-agent
     spec:
-      hostAliases:
-      - ip: "192.168.65.2"
-        hostnames:
-        - "mgmt-control-plane"
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
@@ -181,7 +177,7 @@ spec:
           - name: CATTLE_IS_RKE
             value: "false"
           - name: CATTLE_SERVER
-            value: "https://mgmt-control-plane:8443"
+            value: "https://192.168.2.249:8443"
           - name: CATTLE_CA_CHECKSUM
             value: "060895aef613d18267f65f5c9fad5d3d20ecb22ea10097beea70c1e69e49745e"
           - name: CATTLE_CLUSTER

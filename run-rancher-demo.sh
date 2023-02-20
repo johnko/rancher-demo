@@ -30,8 +30,18 @@ prod
 
 create_kind_cluster() {
   # image from https://github.com/kubernetes-sigs/kind/releases
-  # kind create cluster --config kind-2-node.yaml \
-  kind create cluster \
+  case $1 in
+    dev)
+      CONFIG_FLAG="--config kind-dev.yaml"
+      ;;
+    mgmt)
+      CONFIG_FLAG="--config kind-mgmt.yaml"
+      ;;
+    *)
+      CONFIG_FLAG=""
+      ;;
+  esac
+  kind create cluster $CONFIG_FLAG \
     --image kindest/node:v1.24.7@sha256:577c630ce8e509131eab1aea12c022190978dd2f745aac5eb1fe65c0807eb315 \
     --name $1
 }
@@ -42,8 +52,8 @@ delete_kind_cluster() {
 install_fleet_agent() {
   # https://rancher.github.io/fleet/agent-initiated/
   CLUSTER_CLIENT_ID="kind-$1"
-  API_SERVER_URL=$(kubectl config view --context $MGMT_CONTEXT --minify --output jsonpath='{.clusters[*].cluster.server}' | sed 's/127.0.0.1/mgmt-control-plane/')
-  API_SERVER_CA=$(kubectl config view --context $MGMT_CONTEXT --minify --raw -o go-template='{{index ((index (index .clusters 0) "cluster")) "certificate-authority-data"|base64decode}}')
+  API_SERVER_URL=$($MGMT_KUBECTL config view --minify --output jsonpath='{.clusters[*].cluster.server}')
+  API_SERVER_CA=$($MGMT_KUBECTL config view --minify --raw -o go-template='{{index ((index (index .clusters 0) "cluster")) "certificate-authority-data"|base64decode}}')
   kubectl config use-context $CLUSTER_CLIENT_ID
   # curl -L -O https://github.com/rancher/fleet/releases/download/v0.5.1/fleet-agent-0.5.1.tgz
   helm -n cattle-fleet-system upgrade --atomic --install --create-namespace --wait \
@@ -66,7 +76,7 @@ if [ "import" == "$1" ]; then
     echo "Generate a new import.yaml"
     exit 1
   fi
-  kubectl --context kind-mgmt get secret -n cattle-system tls-rancher-internal-ca -o go-template='{{ index .data "tls.crt" |base64decode}}' >./ca-additional.pem
+  $MGMT_KUBECTL get secret -n cattle-system tls-rancher-internal-ca -o go-template='{{ index .data "tls.crt" |base64decode}}' >./ca-additional.pem
   kubectl --context kind-dev create namespace cattle-system || true
   kubectl --context kind-dev -n cattle-system create secret generic tls-ca-additional --from-file=ca-additional.pem=./ca-additional.pem || true
   kubectl --context kind-dev apply -f import.yaml
@@ -117,15 +127,16 @@ if [ "start" == "$1" ]; then
 
   $MGMT_KUBECTL -n fleet-local patch clusters.fleet.cattle.io local --type merge --patch '{"metadata":{"labels":{"env":"mgmt"}}}'
   $MGMT_KUBECTL apply -f ./demo.yaml
+  API_SERVER_IP=$($MGMT_KUBECTL config view --minify --output jsonpath='{.clusters[*].cluster.server}' | grep -o -E '[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}')
   set +x
   echo "Use this password to login to Rancher local demo UI: $PASSWORD_FOR_RANCHER_ADMIN"
-  open "https://localhost:8443/dashboard/?setup=$PASSWORD_FOR_RANCHER_ADMIN"
+  open "https://$API_SERVER_IP:8443/dashboard/?setup=$PASSWORD_FOR_RANCHER_ADMIN"
   for i in $(seq 1 10); do
     for pauser in $(seq 1 30); do
       echo -n '.'
       sleep 1
     done
-    $MGMT_KUBECTL -n cattle-system port-forward svc/rancher 8443:443 || true
+    $MGMT_KUBECTL -n cattle-system port-forward svc/rancher --address $API_SERVER_IP 8443:443 || true
   done
   exit 0
 fi
