@@ -178,8 +178,6 @@ spec:
         - name: cluster-register
           imagePullPolicy: IfNotPresent
           env:
-          - name: CATTLE_ADDRESS
-            value: "192.168.65.2:59586"
           - name: CATTLE_IS_RKE
             value: "false"
           - name: CATTLE_SERVER

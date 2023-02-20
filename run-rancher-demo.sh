@@ -61,12 +61,13 @@ if [ "delete" == "$1" ]; then
   exit 0
 fi
 if [ "import" == "$1" ]; then
-  if echo "062b44a523b19ffe644d67530596b16a8ad37ab0  import.yaml" | shasum -c 2>&1 >/dev/null ; then
+  if echo "b36c6d9ba97bef89a59050a54024793aeffd9538  import.yaml" | shasum -c 2>&1 >/dev/null ; then
     echo "Don't use the default import.yaml since the token is invalid."
     echo "Generate a new import.yaml"
     exit 1
   fi
   kubectl --context kind-mgmt get secret -n cattle-system tls-rancher-internal-ca -o go-template='{{ index .data "tls.crt" |base64decode}}' >./ca-additional.pem
+  kubectl --context kind-dev create namespace cattle-system || true
   kubectl --context kind-dev -n cattle-system create secret generic tls-ca-additional --from-file=ca-additional.pem=./ca-additional.pem || true
   kubectl --context kind-dev apply -f import.yaml
   exit 0
