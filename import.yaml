@@ -178,6 +178,8 @@ spec:
         - name: cluster-register
           imagePullPolicy: IfNotPresent
           env:
+          - name: CATTLE_ADDRESS
+            value: "192.168.65.2:59586"
           - name: CATTLE_IS_RKE
             value: "false"
           - name: CATTLE_SERVER
@@ -196,16 +198,26 @@ spec:
             value: 9b358661-3b3c-49eb-863a-61cd4c03d007
           - name: CATTLE_INGRESS_IP_DOMAIN
             value: sslip.io
+          - name: SSL_CERT_DIR
+            value: /etc/tls-ca-additional
           image: rancher/rancher-agent:v2.7.1
           volumeMounts:
           - name: cattle-credentials
             mountPath: /cattle-credentials
             readOnly: true
+          - mountPath: /etc/tls-ca-additional
+            name: tls-ca-additional
       volumes:
       - name: cattle-credentials
         secret:
           secretName: cattle-credentials-260ac3d
           defaultMode: 320
+      - name: tls-ca-additional
+        secret:
+          secretName: tls-ca-additional
+          items:
+          - key: ca-additional.pem
+            path: ca-additional.pem
   strategy:
     type: RollingUpdate
     rollingUpdate:
