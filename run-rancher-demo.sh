@@ -71,7 +71,7 @@ if [ "delete" == "$1" ]; then
   exit 0
 fi
 if [ "import" == "$1" ]; then
-  if echo "b36c6d9ba97bef89a59050a54024793aeffd9538  import.yaml" | shasum -c 2>&1 >/dev/null ; then
+  if echo "16dbcae18a9de4d6e16d98f59cf1f46b54af86df  import.yaml" | shasum -c 2>&1 >/dev/null ; then
     echo "Don't use the default import.yaml since the token is invalid."
     echo "Generate a new import.yaml"
     exit 1

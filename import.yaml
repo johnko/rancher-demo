@@ -63,11 +63,11 @@ roleRef:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: cattle-credentials-260ac3d
+  name: cattle-credentials-cc423f7
   namespace: cattle-system
 type: Opaque
 data:
-  url: "aHR0cHM6Ly9tZ210LWNvbnRyb2wtcGxhbmU6ODQ0Mw=="
+  url: "aHR0cHM6Ly8xOTIuMTY4LjIuMjQ5Ojg0NDM="
   token: "YnI0Ym0yczY2a3NibXdjNW44N3Z6NGtzdDR0aGRuczV0ZjJzeHJ0NzV0OHB2cnFyZHBkNjU"
   namespace: ""
 
@@ -179,7 +179,7 @@ spec:
           - name: CATTLE_SERVER
             value: "https://192.168.2.249:8443"
           - name: CATTLE_CA_CHECKSUM
-            value: "060895aef613d18267f65f5c9fad5d3d20ecb22ea10097beea70c1e69e49745e"
+            value: "b904d060c9153ccfb8dcfbf77266be58a9f392d8531f44c9ad990f134dc0d7de"
           - name: CATTLE_CLUSTER
             value: "true"
           - name: CATTLE_K8S_MANAGED
@@ -189,7 +189,7 @@ spec:
           - name: CATTLE_SERVER_VERSION
             value: v2.7.1
           - name: CATTLE_INSTALL_UUID
-            value: 9b358661-3b3c-49eb-863a-61cd4c03d007
+            value: c49c53e8-93d0-4c69-836d-2c4bb1a4c8f4
           - name: CATTLE_INGRESS_IP_DOMAIN
             value: sslip.io
           - name: SSL_CERT_DIR
@@ -204,7 +204,7 @@ spec:
       volumes:
       - name: cattle-credentials
         secret:
-          secretName: cattle-credentials-260ac3d
+          secretName: cattle-credentials-cc423f7
           defaultMode: 320
       - name: tls-ca-additional
         secret:

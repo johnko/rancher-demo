@@ -32,6 +32,7 @@ Tested on:
 - 6 CPU allocated to docker
 - 32GB allocated to docker
 - 500GB SSD allocated to docker
+- 2 NIC (one for mgmt cluster, one for dev cluster) edit IP address in kind-mgmt.yaml and kind-dev.yaml
 
 ## Start Management and Member clusters
 
